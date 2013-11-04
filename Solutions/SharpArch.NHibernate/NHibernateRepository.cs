@@ -8,7 +8,7 @@
     ///     an entity with a type other than int, such as string, then use 
     ///     <see cref = "NHibernateRepositoryWithTypedId{T, IdT}" />.
     /// </summary>
-    public class NHibernateRepository<T> : NHibernateRepositoryWithTypedId<T, int>, INHibernateRepository<T>
+    public class NHibernateRepository<T> : NHibernateRepositoryWithTypedId<T, System.Guid>, INHibernateRepository<T>
     {
     }
 }
