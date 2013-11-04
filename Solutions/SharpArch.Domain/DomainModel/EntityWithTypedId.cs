@@ -7,6 +7,7 @@ namespace SharpArch.Domain.DomainModel
     using System.Xml.Serialization;
 
     using Newtonsoft.Json;
+    using System.ComponentModel.DataAnnotations;
 
     /// <summary>
     ///     For a discussion of this object, see 
@@ -40,6 +41,7 @@ namespace SharpArch.Domain.DomainModel
         ///         you'd like to have the ID XML serialized.
         ///     </para>
         /// </remarks>        
+        [Key]
         [XmlIgnore]
         [JsonProperty]
         public virtual TId Id { get; protected set; }
