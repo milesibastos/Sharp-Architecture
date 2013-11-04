@@ -247,7 +247,7 @@ namespace Tests.SharpArch.Web.Mvc.ModelBinder
             ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(windsorContainer));
         }
 
-        public class Employee : Entity
+        public class Employee : EntityWithTypedId<int>
         {
             public Employee()
             {
