@@ -150,7 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SharpArch.Domain\SharpArch.Domain.csproj">
-      <Project>{E12E99BB-8732-441F-B3A6-861F0CE23D3D}</Project>
+      <Project>{e12e99bb-8732-441f-b3a6-861f0ce23d3d}</Project>
       <Name>SharpArch.Domain</Name>
     </ProjectReference>
     <ProjectReference Include="..\SharpArch.Wcf\SharpArch.Wcf.csproj">
