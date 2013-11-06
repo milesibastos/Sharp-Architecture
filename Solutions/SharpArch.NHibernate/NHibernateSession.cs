@@ -1,6 +1,7 @@
 ﻿namespace SharpArch.NHibernate
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
@@ -12,11 +13,21 @@
     using global::FluentNHibernate.Cfg.Db;
 
     using global::NHibernate;
+    using global::NHibernate.Connection;
+    using global::NHibernate.Dialect;
+    using global::NHibernate.Driver;
     using global::NHibernate.Cfg;
     using global::NHibernate.Event;
+    using global::NHibernate.Cfg.MappingSchema;
+    using global::NHibernate.Mapping.ByCode;
+    using global::NHibernate.Validator.Engine;
+    using global::NHibernate.Validator.Cfg.Loquacious;
+    using global::NHibernate.Validator.Cfg;
     // using global::NHibernate.Validator.Engine;
 
     using SharpArch.NHibernate.NHibernateValidator;
+    using SharpArch.NHibernate.Mapping.ByCode;
+    using System.Data;
 
     public static class NHibernateSession
     {
@@ -321,18 +332,17 @@
             }
         }
 
-        public static Configuration Init(
-            SimpleSessionStorage storage, 
-            global::NHibernate.Cfg.MappingSchema.HbmMapping mapping,
-            string cfgFile)
+        public static Configuration Init(SimpleSessionStorage storage, 
+            string connectionString, Assembly mappingsAssembly, string mappingsNamespace, 
+            string validationDefinitionsNamespace, bool showLogs, string outputXmlMappingsFile, 
+            Type baseEntityToIgnore, bool mapAllEnumsToStrings, Action<ModelMapper> autoMappingOverride)
         {
             InitStorage(storage);
 
             try
             {
-                var configuration = new Configuration();
-                configuration.Configure(cfgFile);
-                configuration.AddDeserializedMapping(mapping, null);
+                var configuration = ReadConfigFromCacheFileOrBuildIt(mappingsAssembly, connectionString, showLogs, 
+                    baseEntityToIgnore, mappingsNamespace, mapAllEnumsToStrings, autoMappingOverride, outputXmlMappingsFile, validationDefinitionsNamespace);
                 var sessionFactory = configuration.BuildSessionFactory();
 
                 return AddConfiguration(DefaultFactoryKey, sessionFactory, configuration, string.Empty);
@@ -344,6 +354,123 @@
                 Storage = null;
                 throw;
             }
+        }
+
+        private static Configuration ReadConfigFromCacheFileOrBuildIt(Assembly mappingsAssembly, string connectionString, bool showLogs, 
+            Type baseEntityToIgnore, string mappingsNamespace, bool mapAllEnumsToStrings, Action<ModelMapper> autoMappingOverride,
+            string outputXmlMappingsFile, string validationDefinitionsNamespace)
+        {
+            Configuration nhConfigurationCache;
+            var nhCfgCache = new ConfigurationFileCache(mappingsAssembly);
+            var cachedCfg = nhCfgCache.LoadConfigurationFromFile();
+            if (cachedCfg == null)
+            {
+                nhConfigurationCache = BuildConfiguration(connectionString, showLogs, baseEntityToIgnore, mappingsAssembly,
+                    mappingsNamespace, mapAllEnumsToStrings, autoMappingOverride, outputXmlMappingsFile, validationDefinitionsNamespace);
+                nhCfgCache.SaveConfigurationToFile(nhConfigurationCache);
+            }
+            else
+            {
+                nhConfigurationCache = cachedCfg;
+            }
+            return nhConfigurationCache;
+        }
+
+        private static Configuration BuildConfiguration(string connectionString, bool showLogs, Type baseEntityToIgnore, 
+            Assembly mappingsAssembly, string mappingsNamespace, bool mapAllEnumsToStrings, 
+            Action<ModelMapper> autoMappingOverride, string outputXmlMappingsFile, string validationDefinitionsNamespace)
+        {
+            var config = InitConfiguration(connectionString, showLogs);
+            var mapping = GetMappings(baseEntityToIgnore, mappingsAssembly, mappingsNamespace, mapAllEnumsToStrings, autoMappingOverride, showLogs, outputXmlMappingsFile);
+            config.AddDeserializedMapping(mapping, "NHSchemaTest");
+            InjectValidationAndFieldLengths(config, validationDefinitionsNamespace, mappingsAssembly);
+            return config;
+        }
+
+        private static Configuration InitConfiguration(string connectionString, bool showLogs)
+        {
+            var configure = new Configuration();
+            configure.SessionFactoryName("BuildIt");
+
+            configure.DataBaseIntegration(db =>
+            {
+                db.ConnectionProvider<DriverConnectionProvider>();
+                db.Dialect<SQLiteDialect>();
+                db.Driver<SQLite20Driver>();
+                db.KeywordsAutoImport = Hbm2DDLKeyWords.AutoQuote;
+                db.IsolationLevel = IsolationLevel.ReadCommitted;
+                db.ConnectionString = connectionString;
+                db.Timeout = 10;
+                db.BatchSize = 20;
+
+                if (showLogs)
+                {
+                    db.LogFormattedSql = true;
+                    db.LogSqlInConsole = true;
+                    db.AutoCommentSql = false;
+                }
+            });
+
+            return configure;
+        }
+
+        private static HbmMapping GetMappings(Type baseEntityToIgnore, Assembly mappingsAssembly, string mappingsNamespace, 
+            bool mapAllEnumsToStrings, Action<ModelMapper> autoMappingOverride, bool showLogs, string outputXmlMappingsFile)
+        {
+            //Using the built-in auto-mapper
+            var mapper = new ConventionModelMapper();
+            DefineBaseClass(mapper, baseEntityToIgnore);
+            var allEntities = mappingsAssembly.GetTypes().Where(t => t.Namespace == mappingsNamespace).ToList();
+            mapper.AddAllManyToManyRelations(allEntities);
+            mapper.ApplyNamingConventions();
+            if (mapAllEnumsToStrings) mapper.MapAllEnumsToStrings();
+            if (autoMappingOverride != null) autoMappingOverride(mapper);
+
+            var mapping = mapper.CompileMappingFor(allEntities);
+            showOutputXmlMappings(mapping, showLogs, outputXmlMappingsFile);
+            return mapping;
+        }
+
+        private static void DefineBaseClass(ConventionModelMapper mapper, Type baseEntityToIgnore)
+        {
+            if (baseEntityToIgnore == null) return;
+            mapper.IsEntity((type, declared) =>
+                baseEntityToIgnore.IsAssignableFrom(type) &&
+                baseEntityToIgnore != type &&
+                !type.IsInterface);
+            mapper.IsRootEntity((type, declared) => type.BaseType == baseEntityToIgnore);
+        }
+
+        private static void showOutputXmlMappings(HbmMapping mapping, bool showLogs, string outputXmlMappingsFile)
+        {
+            if (!showLogs) return;
+            var outputXmlMappings = mapping.AsString();
+            Console.WriteLine(outputXmlMappings);
+            File.WriteAllText(outputXmlMappingsFile, outputXmlMappings);
+        }
+
+        private static void InjectValidationAndFieldLengths(Configuration nhConfig, string validationDefinitionsNamespace, Assembly mappingsAssembly)
+        {
+            if (string.IsNullOrWhiteSpace(validationDefinitionsNamespace))
+                return;
+
+            var mappingsValidatorEngine = new ValidatorEngine();
+            var configuration = new global::NHibernate.Validator.Cfg.Loquacious.FluentConfiguration();
+            var validationDefinitions = mappingsAssembly.GetTypes()
+                                                        .Where(t => t.Namespace == validationDefinitionsNamespace)
+                                                        .ValidationDefinitions();
+            configuration
+                    .Register(validationDefinitions)
+                    .SetDefaultValidatorMode(ValidatorMode.OverrideExternalWithAttribute)
+                    .IntegrateWithNHibernate
+                    .ApplyingDDLConstraints()
+                    .And
+                    .RegisteringListeners();
+
+            mappingsValidatorEngine.Configure(configuration);
+
+            //Registering of Listeners and DDL-applying here
+            nhConfig.Initialize(mappingsValidatorEngine);
         }
 
         public static void InitStorage(ISessionStorage storage)
