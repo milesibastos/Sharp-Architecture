@@ -49,7 +49,7 @@ namespace SharpArch.NHibernate.Mapping.ByCode
         public static void ManyToManyConvention(IModelInspector modelInspector, PropertyPath member, IManyToManyMapper map)
         {
             map.ForeignKey(
-                string.Format("fk_{0}_{1}",
+                string.Format("FK_{0}_{1}",
                        member.LocalMember.Name,
                        member.GetContainerEntity(modelInspector).Name));
         }
@@ -75,7 +75,7 @@ namespace SharpArch.NHibernate.Mapping.ByCode
             map.Table(Service.Pluralize(type.Name));
             map.Key(x =>
             {
-                x.ForeignKey(string.Format("fk_{0}_{1}",
+                x.ForeignKey(string.Format("FK_{0}_{1}",
                                                 type.BaseType.Name,
                                                 type.Name));
                 x.Column(type.Name + "Id");
@@ -154,7 +154,7 @@ namespace SharpArch.NHibernate.Mapping.ByCode
             map.Id(k =>
             {
                 k.Generator(Generators.Native);
-                k.Column(type.Name + "Id");
+                k.Column("Id");
             });
         }
 

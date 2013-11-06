@@ -332,6 +332,40 @@
             }
         }
 
+        public static Configuration Init(Configuration configuration, SimpleSessionStorage storage,
+            Type[] baseEntityToIgnore,
+            Type[] allEntities,
+            Action<ModelMapper> autoMappingOverride)
+        {
+            InitStorage(storage);
+
+            try
+            {
+                var mapper = new ConventionModelMapper();
+
+                DefineBaseClass(mapper, baseEntityToIgnore);
+                mapper.AddAllManyToManyRelations(allEntities);
+                mapper.ApplyNamingConventions();
+                mapper.MapAllEnumsToStrings();
+                if (autoMappingOverride != null) autoMappingOverride(mapper);
+
+                var mapping = mapper.CompileMappingFor(allEntities);
+                showOutputXmlMappings(mapping, true, "mappings.xml");
+
+                configuration.AddDeserializedMapping(mapping, null);
+                var sessionFactory = configuration.BuildSessionFactory();
+
+                return AddConfiguration(DefaultFactoryKey, sessionFactory, configuration, string.Empty);
+            }
+            catch
+            {
+                // If this NHibernate config throws an exception, null the Storage reference so 
+                // the config can be corrected without having to restart the web application.
+                Storage = null;
+                throw;
+            }
+        }
+
         public static Configuration Init(SimpleSessionStorage storage, 
             string connectionString, Assembly mappingsAssembly, string mappingsNamespace, 
             string validationDefinitionsNamespace, bool showLogs, string outputXmlMappingsFile, 
@@ -419,7 +453,7 @@
         {
             //Using the built-in auto-mapper
             var mapper = new ConventionModelMapper();
-            DefineBaseClass(mapper, baseEntityToIgnore);
+            DefineBaseClass(mapper, new[] { baseEntityToIgnore });
             var allEntities = mappingsAssembly.GetTypes().Where(t => t.Namespace == mappingsNamespace).ToList();
             mapper.AddAllManyToManyRelations(allEntities);
             mapper.ApplyNamingConventions();
@@ -431,14 +465,14 @@
             return mapping;
         }
 
-        private static void DefineBaseClass(ConventionModelMapper mapper, Type baseEntityToIgnore)
+        private static void DefineBaseClass(ConventionModelMapper mapper, Type[] baseEntityToIgnore)
         {
             if (baseEntityToIgnore == null) return;
             mapper.IsEntity((type, declared) =>
-                baseEntityToIgnore.IsAssignableFrom(type) &&
-                baseEntityToIgnore != type &&
+                baseEntityToIgnore.Any(x => x.IsAssignableFrom(type)) &&
+                !baseEntityToIgnore.Any(x => x == type) &&
                 !type.IsInterface);
-            mapper.IsRootEntity((type, declared) => type.BaseType == baseEntityToIgnore);
+            mapper.IsRootEntity((type, declared) => baseEntityToIgnore.Any(x => x == type.BaseType));
         }
 
         private static void showOutputXmlMappings(HbmMapping mapping, bool showLogs, string outputXmlMappingsFile)
