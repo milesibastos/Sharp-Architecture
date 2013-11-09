@@ -78,7 +78,7 @@ namespace SharpArch.NHibernate.Mapping.ByCode
                 x.ForeignKey(string.Format("FK_{0}_{1}",
                                                 type.BaseType.Name,
                                                 type.Name));
-                x.Column(type.Name + "Id");
+                x.Column(type.BaseType.Name + "Id");
             });
         }
 
@@ -153,7 +153,7 @@ namespace SharpArch.NHibernate.Mapping.ByCode
         {
             map.Id(k =>
             {
-                k.Generator(Generators.Native);
+                k.Generator(Generators.GuidComb);
                 k.Column("Id");
             });
         }

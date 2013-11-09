@@ -115,7 +115,7 @@ namespace SharpArch.NHibernate.Mapping.ByCode
                                                 cm.Table(tableName);
                                                 cm.Key(km => 
                                                 {
-                                                    km.ForeignKey(string.Format("fk_{0}_{1}",
+                                                    km.ForeignKey(string.Format("FK_{0}_{1}",
                                                                                     property.Name,
                                                                                     controllingColumnName)); 
                                                     km.Column(controllingColumnName); 
