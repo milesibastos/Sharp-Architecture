@@ -332,7 +332,7 @@
             }
         }
 
-        public static Configuration Init(Configuration configuration, SimpleSessionStorage storage,
+        public static Configuration Init(Configuration configuration, ISessionStorage storage,
             Type[] baseEntityToIgnore,
             Type[] allEntities,
             Action<ModelMapper> autoMappingOverride)
