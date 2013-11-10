@@ -140,7 +140,7 @@ namespace SharpArch.NHibernate.Mapping.ByCode
                 map.Key(x => x.Column(member.GetContainerEntity(modelInspector).Name + "Id"));
                 map.Cascade(Cascade.All | Cascade.DeleteOrphans);
                 map.BatchSize(20);
-                map.Inverse(true);
+                //map.Inverse(true);
             }
         }
 
