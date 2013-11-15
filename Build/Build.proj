@@ -4,9 +4,7 @@
     <PropertyGroup>
         <VersionMajor>4</VersionMajor>
         <VersionMinor>0</VersionMinor>
-        <VersionPatch>0</VersionPatch>
-        <VersionPreRelease>Beta</VersionPreRelease>
-        <BUILD_NUMBER>2000</BUILD_NUMBER>
+        <VersionPatch>2000</VersionPatch>
     </PropertyGroup>
 
     <PropertyGroup>
