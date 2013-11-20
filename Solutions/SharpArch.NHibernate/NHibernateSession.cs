@@ -335,7 +335,8 @@
         public static Configuration Init(Configuration configuration, ISessionStorage storage,
             Type[] baseEntityToIgnore,
             Type[] allEntities,
-            Action<ModelMapper> autoMappingOverride)
+            Action<ModelMapper> autoMappingOverride,
+            bool showLogs = false)
         {
             InitStorage(storage);
 
@@ -350,7 +351,7 @@
                 if (autoMappingOverride != null) autoMappingOverride(mapper);
 
                 var mapping = mapper.CompileMappingFor(allEntities);
-                showOutputXmlMappings(mapping, true, "mappings.xml");
+                showOutputXmlMappings(mapping, showLogs, "mappings.xml");
 
                 configuration.AddDeserializedMapping(mapping, null);
                 var sessionFactory = configuration.BuildSessionFactory();
@@ -480,7 +481,8 @@
             if (!showLogs) return;
             var outputXmlMappings = mapping.AsString();
             Console.WriteLine(outputXmlMappings);
-            File.WriteAllText(outputXmlMappingsFile, outputXmlMappings);
+            var path = Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), outputXmlMappingsFile);
+            File.WriteAllText(path, outputXmlMappings);
         }
 
         private static void InjectValidationAndFieldLengths(Configuration nhConfig, string validationDefinitionsNamespace, Assembly mappingsAssembly)

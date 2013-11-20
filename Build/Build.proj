@@ -4,7 +4,7 @@
     <PropertyGroup>
         <VersionMajor>4</VersionMajor>
         <VersionMinor>0</VersionMinor>
-        <VersionPatch>2000</VersionPatch>
+        <VersionPatch>2001</VersionPatch>
     </PropertyGroup>
 
     <PropertyGroup>
