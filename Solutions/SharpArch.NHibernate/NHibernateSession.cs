@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
 
     using Domain;
@@ -10,6 +11,7 @@
     using global::NHibernate;
     using global::NHibernate.Cfg;
     using global::NHibernate.Event;
+    using global::NHibernate.Engine;
     // using global::NHibernate.Validator.Engine;
 
     using SharpArch.NHibernate.NHibernateValidator;
@@ -114,7 +116,7 @@
             Check.Require(!string.IsNullOrEmpty(factoryKey), "factoryKey may not be null or empty");
             Check.Require(Storage != null, "An ISessionStorage has not been configured");
             Check.Require(
-                SessionFactories.ContainsKey(factoryKey), 
+                SessionFactories.ContainsKey(factoryKey),
                 "An ISessionFactory does not exist with a factory key of " + factoryKey);
 
             var session = Storage.GetSessionForKey(factoryKey);
@@ -136,6 +138,18 @@
             return session;
         }
 
+        public static ISession CurrentFor<TEntity>()
+        {
+            Check.Require(Storage != null, "An ISessionStorage has not been configured");
+            Check.Require(
+                SessionFactories.Any(x => ((ISessionFactoryImplementor)x.Value).TryGetEntityPersister(typeof(TEntity).FullName) != null),
+                "An ISessionFactory does not exist to " + typeof(TEntity).FullName);
+
+            var factoryKey = SessionFactories.Single(x => ((ISessionFactoryImplementor)x.Value).TryGetEntityPersister(typeof(TEntity).FullName) != null).Key;
+
+            return CurrentFor(factoryKey);
+        }
+
         /// <summary>
         ///     Returns the default ISessionFactory using the DefaultFactoryKey.
         /// </summary>
@@ -155,6 +169,17 @@
             }
 
             return SessionFactories[factoryKey];
+        }
+
+        public static ISessionFactory GetSessionFactory<TEntity>()
+        {
+            return GetSessionFactory(typeof(TEntity));
+        }
+
+        public static ISessionFactory GetSessionFactory(Type type)
+        {
+            var factory = SessionFactories.Values.Single(x => ((ISessionFactoryImplementor)x).TryGetEntityPersister(type.FullName) != null);
+            return factory;
         }
 
         public static Configuration Init(ISessionStorage storage)
