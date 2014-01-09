@@ -7,10 +7,6 @@
 
     using Domain;
 
-    using global::FluentNHibernate.Automapping;
-    using global::FluentNHibernate.Cfg;
-    using global::FluentNHibernate.Cfg.Db;
-
     using global::NHibernate;
     using global::NHibernate.Cfg;
     using global::NHibernate.Event;
@@ -88,68 +84,6 @@
         /// </summary>
         public static ISessionStorage Storage { get; set; }
 
-        public static Configuration AddConfiguration(
-            string factoryKey, 
-            string[] mappingAssemblies, 
-            AutoPersistenceModel autoPersistenceModel, 
-            string cfgFile, 
-            IDictionary<string, string> cfgProperties, 
-            string validatorCfgFile, 
-            IPersistenceConfigurer persistenceConfigurer)
-        {
-            Configuration config;
-            var configCache = ConfigurationCache;
-            if (configCache != null)
-            {
-                config = configCache.LoadConfiguration(factoryKey, cfgFile, mappingAssemblies);
-                if (config != null)
-                {
-                    return AddConfiguration(factoryKey, config.BuildSessionFactory(), config, validatorCfgFile);
-                }
-            }
-
-            config = AddConfiguration(
-                factoryKey, 
-                mappingAssemblies, 
-                autoPersistenceModel, 
-                ConfigureNHibernate(cfgFile, cfgProperties), 
-                validatorCfgFile, 
-                persistenceConfigurer);
-
-            if (configCache != null)
-            {
-                configCache.SaveConfiguration(factoryKey, config);
-            }
-
-            return config;
-        }
-
-        public static Configuration AddConfiguration(
-            string factoryKey, 
-            string[] mappingAssemblies, 
-            AutoPersistenceModel autoPersistenceModel, 
-            Configuration cfg, 
-            string validatorCfgFile, 
-            IPersistenceConfigurer persistenceConfigurer)
-        {
-            var sessionFactory = CreateSessionFactoryFor(
-                mappingAssemblies, autoPersistenceModel, cfg, persistenceConfigurer);
-
-            return AddConfiguration(factoryKey, sessionFactory, cfg, validatorCfgFile);
-        }
-
-        public static Configuration AddConfiguration(
-            string factoryKey, ISessionFactory sessionFactory, Configuration cfg, string validatorCfgFile)
-        {
-            Check.Require(
-                !SessionFactories.ContainsKey(factoryKey), 
-                "A session factory has already been configured with the key of " + factoryKey);
-
-            SessionFactories.Add(factoryKey, sessionFactory);
-
-            return cfg;
-        }
-
         /// <summary>
         ///     This method is used by application-specific session storage implementations
         ///     and unit tests. Its job is to walk thru existing cached sessions and Close() each one.
@@ -223,94 +157,39 @@
             return SessionFactories[factoryKey];
         }
 
-        public static Configuration Init(ISessionStorage storage, string[] mappingAssemblies)
+        public static Configuration Init(ISessionStorage storage)
         {
-            return Init(storage, mappingAssemblies, null, null, null, null, null);
+            return Init(storage, null, null, null);
         }
 
-        public static Configuration Init(ISessionStorage storage, string[] mappingAssemblies, string cfgFile)
+        public static Configuration Init(ISessionStorage storage, string cfgFile)
         {
-            return Init(storage, mappingAssemblies, null, cfgFile, null, null, null);
-        }
-
-        public static Configuration Init(
-            ISessionStorage storage, string[] mappingAssemblies, IDictionary<string, string> cfgProperties)
-        {
-            return Init(storage, mappingAssemblies, null, null, cfgProperties, null, null);
+            return Init(storage, cfgFile, null, null);
         }
 
         public static Configuration Init(
-            ISessionStorage storage, string[] mappingAssemblies, string cfgFile, string validatorCfgFile)
+            ISessionStorage storage, IDictionary<string, string> cfgProperties)
         {
-            return Init(storage, mappingAssemblies, null, cfgFile, null, validatorCfgFile, null);
+            return Init(storage, null, cfgProperties, null);
         }
 
         public static Configuration Init(
-            ISessionStorage storage, string[] mappingAssemblies, AutoPersistenceModel autoPersistenceModel)
+            ISessionStorage storage, string cfgFile, string validatorCfgFile)
         {
-            return Init(storage, mappingAssemblies, autoPersistenceModel, null, null, null, null);
+            return Init(storage, cfgFile, null, validatorCfgFile);
         }
 
         public static Configuration Init(
-            ISessionStorage storage, 
-            string[] mappingAssemblies, 
-            AutoPersistenceModel autoPersistenceModel, 
-            string cfgFile)
-        {
-            return Init(storage, mappingAssemblies, autoPersistenceModel, cfgFile, null, null, null);
-        }
-
-        public static Configuration Init(
-            ISessionStorage storage, 
-            string[] mappingAssemblies, 
-            AutoPersistenceModel autoPersistenceModel, 
-            IDictionary<string, string> cfgProperties)
-        {
-            return Init(storage, mappingAssemblies, autoPersistenceModel, null, cfgProperties, null, null);
-        }
-
-        public static Configuration Init(
-            ISessionStorage storage, 
-            string[] mappingAssemblies, 
-            AutoPersistenceModel autoPersistenceModel, 
-            string cfgFile, 
+            ISessionStorage storage,
+            string cfgFile,
+            IDictionary<string, string> cfgProperties,
             string validatorCfgFile)
-        {
-            return Init(storage, mappingAssemblies, autoPersistenceModel, cfgFile, null, validatorCfgFile, null);
-        }
-
-        public static Configuration Init(
-            ISessionStorage storage, 
-            string[] mappingAssemblies, 
-            AutoPersistenceModel autoPersistenceModel, 
-            string cfgFile, 
-            IDictionary<string, string> cfgProperties, 
-            string validatorCfgFile)
-        {
-            return Init(
-                storage, mappingAssemblies, autoPersistenceModel, cfgFile, cfgProperties, validatorCfgFile, null);
-        }
-
-        public static Configuration Init(
-            ISessionStorage storage, 
-            string[] mappingAssemblies, 
-            AutoPersistenceModel autoPersistenceModel, 
-            string cfgFile, 
-            IDictionary<string, string> cfgProperties, 
-            string validatorCfgFile, 
-            IPersistenceConfigurer persistenceConfigurer)
         {
             InitStorage(storage);
+            Configuration config = ConfigureNHibernate(cfgFile, cfgProperties);
             try
             {
-                return AddConfiguration(
-                    DefaultFactoryKey, 
-                    mappingAssemblies, 
-                    autoPersistenceModel, 
-                    cfgFile, 
-                    cfgProperties, 
-                    validatorCfgFile, 
-                    persistenceConfigurer);
+                return AddConfiguration(DefaultFactoryKey, config.BuildSessionFactory(), config, validatorCfgFile);
             }
             catch
             {
@@ -319,6 +198,18 @@
                 Storage = null;
                 throw;
             }
+        }
+
+        public static Configuration AddConfiguration(
+            string factoryKey, ISessionFactory sessionFactory, Configuration cfg, string validatorCfgFile)
+        {
+            Check.Require(
+                !SessionFactories.ContainsKey(factoryKey),
+                "A session factory has already been configured with the key of " + factoryKey);
+
+            SessionFactories.Add(factoryKey, sessionFactory);
+
+            return cfg;
         }
 
         public static void InitStorage(ISessionStorage storage)
@@ -369,7 +260,7 @@
             ConfigurationCache = null;
         }
 
-        private static Configuration ConfigureNHibernate(string cfgFile, IDictionary<string, string> cfgProperties)
+        internal static Configuration ConfigureNHibernate(string cfgFile, IDictionary<string, string> cfgProperties)
         {
             var cfg = new Configuration();
 
@@ -391,55 +282,5 @@
             return cfg;
         }
 
-        private static ISessionFactory CreateSessionFactoryFor(
-            IEnumerable<string> mappingAssemblies, 
-            AutoPersistenceModel autoPersistenceModel, 
-            Configuration cfg, 
-            IPersistenceConfigurer persistenceConfigurer)
-        {
-            var fluentConfiguration = Fluently.Configure(cfg);
-
-            if (persistenceConfigurer != null)
-            {
-                fluentConfiguration.Database(persistenceConfigurer);
-            }
-
-            fluentConfiguration.Mappings(
-                m =>
-                    {
-                        foreach (var mappingAssembly in mappingAssemblies)
-                        {
-                            var assembly = Assembly.LoadFrom(MakeLoadReadyAssemblyName(mappingAssembly));
-
-                            m.HbmMappings.AddFromAssembly(assembly);
-                            m.FluentMappings.AddFromAssembly(assembly).Conventions.AddAssembly(assembly);
-                        }
-
-                        if (autoPersistenceModel != null)
-                        {
-                            m.AutoMappings.Add(autoPersistenceModel);
-                        }
-                    });
-
-            fluentConfiguration.ExposeConfiguration(
-                e =>
-                    {
-                        e.EventListeners.PreInsertEventListeners = new IPreInsertEventListener[]
-                            {
-                                new DataAnnotationsEventListener()
-                            };
-                        e.EventListeners.PreUpdateEventListeners = new IPreUpdateEventListener[]
-                            {
-                                new DataAnnotationsEventListener()
-                            };
-                    });
-
-            return fluentConfiguration.BuildSessionFactory();
-        }
-
-        private static string MakeLoadReadyAssemblyName(string assemblyName)
-        {
-            return (assemblyName.IndexOf(".dll") == -1) ? assemblyName.Trim() + ".dll" : assemblyName.Trim();
-        }
     }
 }

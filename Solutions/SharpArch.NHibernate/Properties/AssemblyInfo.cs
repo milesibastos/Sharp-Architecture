@@ -9,3 +9,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyProduct("SharpArch.NHibernate")]
 [assembly: Guid("2f9aa218-343d-47a5-9e10-5067a8ee5e9f")]
+
+[assembly: InternalsVisibleTo("SharpArch.NHibernate.FluentNHibernate")]

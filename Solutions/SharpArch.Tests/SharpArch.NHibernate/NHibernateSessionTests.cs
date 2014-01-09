@@ -6,6 +6,7 @@ namespace SharpArch.Features.Tests.SharpArch.Features.NHibernate
     using FluentNHibernate.Cfg.Db;
 
     using global::SharpArch.NHibernate;
+    using global::SharpArch.NHibernate.FluentNHibernate;
 
     using NUnit.Framework;
 
@@ -17,7 +18,7 @@ namespace SharpArch.Features.Tests.SharpArch.Features.NHibernate
         {
             var configFile = "sqlite-nhibernate-config.xml";
             var mappingAssemblies = new string[] { };
-            var configuration = NHibernateSession.Init(new SimpleSessionStorage(), mappingAssemblies, configFile);
+            var configuration = NHibernateFactory.Init(new SimpleSessionStorage(), mappingAssemblies, configFile);
 
             Assert.That(configuration, Is.Not.Null);
         }
@@ -28,7 +29,7 @@ namespace SharpArch.Features.Tests.SharpArch.Features.NHibernate
             var configFile = "sqlite-nhibernate-config.xml";
             var mappingAssemblies = new string[] { };
             NHibernateSession.ConfigurationCache = new NHibernateConfigurationFileCache(new[] { "SharpArch.NHibernate" });
-            var configuration = NHibernateSession.Init(new SimpleSessionStorage(), mappingAssemblies, configFile);
+            var configuration = NHibernateFactory.Init(new SimpleSessionStorage(), mappingAssemblies, configFile);
 
             Assert.That(configuration, Is.Not.Null);
         }
@@ -39,8 +40,8 @@ namespace SharpArch.Features.Tests.SharpArch.Features.NHibernate
             var configFile = "sqlite-nhibernate-config.xml";
             var mappingAssemblies = new string[] { };
             NHibernateSession.ConfigurationCache = new NHibernateConfigurationFileCache(new[] { "SharpArch.NHibernate" });
-            var configuration1 = NHibernateSession.Init(new SimpleSessionStorage(), mappingAssemblies, configFile);
-            var configuration2 = NHibernateSession.AddConfiguration(
+            var configuration1 = NHibernateFactory.Init(new SimpleSessionStorage(), mappingAssemblies, configFile);
+            var configuration2 = NHibernateFactory.AddConfiguration(
                 "secondDatabase", new string[] { }, null, configFile, null, null, null);
 
             Assert.That(configuration1, Is.Not.Null);
@@ -55,7 +56,7 @@ namespace SharpArch.Features.Tests.SharpArch.Features.NHibernate
 
             var mappingAssemblies = new string[] { };
 
-            var configuration = NHibernateSession.Init(
+            var configuration = NHibernateFactory.Init(
                 new SimpleSessionStorage(), mappingAssemblies, null, configFile, null, null, persistenceConfigurer);
 
             Assert.That(configuration, Is.Not.Null);
@@ -68,7 +69,7 @@ namespace SharpArch.Features.Tests.SharpArch.Features.NHibernate
 
             var mappingAssemblies = new string[] { };
 
-            var configuration = NHibernateSession.Init(
+            var configuration = NHibernateFactory.Init(
                 new SimpleSessionStorage(), mappingAssemblies, null, null, null, null, persistenceConfigurer);
 
             Assert.That(configuration, Is.Not.Null);
@@ -84,7 +85,7 @@ namespace SharpArch.Features.Tests.SharpArch.Features.NHibernate
                     var mappingAssemblies = new string[] { };
                     NHibernateSession.ConfigurationCache =
                         new NHibernateConfigurationFileCache(new[] { "SharpArch.NHibernate" });
-                    var configuration = NHibernateSession.Init(
+                    var configuration = NHibernateFactory.Init(
                         new SimpleSessionStorage(), mappingAssemblies, configFile);
 
                     // Set ConfigurationCache to a different file cache object
@@ -105,7 +106,7 @@ namespace SharpArch.Features.Tests.SharpArch.Features.NHibernate
                     // Random Guid value as dependency file to cause the exception
                     NHibernateSession.ConfigurationCache =
                         new NHibernateConfigurationFileCache(new[] { Guid.NewGuid().ToString() });
-                    var configuration = NHibernateSession.Init(
+                    var configuration = NHibernateFactory.Init(
                         new SimpleSessionStorage(), mappingAssemblies, configFile);
                 });
         }

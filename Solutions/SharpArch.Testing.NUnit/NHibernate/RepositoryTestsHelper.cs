@@ -66,7 +66,7 @@
         {
             var mappingAssemblies = GetMappingAssemblies();
             var autoPersistenceModel = GetAutoPersistenceModel(mappingAssemblies);
-            return NHibernateSession.Init(new SimpleSessionStorage(), mappingAssemblies, autoPersistenceModel);
+            return NHibernateFactory.Init(new SimpleSessionStorage(), mappingAssemblies, autoPersistenceModel);
         }
 
         public static void Shutdown()

@@ -50,6 +50,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpArch.Web.Http.Castle",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpArch.Web.Http", "SharpArch.Web.Http\SharpArch.Web.Http.csproj", "{35EC85F7-5D2E-4FE0-842A-807598FB6D1F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpArch.NHibernate.FluentNHibernate", "SharpArch.NHibernate.FluentNHibernate\SharpArch.NHibernate.FluentNHibernate.csproj", "{A67064B8-335F-42C3-808A-A470BB4BFE5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -180,6 +182,16 @@ Global
 		{35EC85F7-5D2E-4FE0-842A-807598FB6D1F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{35EC85F7-5D2E-4FE0-842A-807598FB6D1F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{35EC85F7-5D2E-4FE0-842A-807598FB6D1F}.Release|x86.ActiveCfg = Release|Any CPU
+		{A67064B8-335F-42C3-808A-A470BB4BFE5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A67064B8-335F-42C3-808A-A470BB4BFE5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A67064B8-335F-42C3-808A-A470BB4BFE5C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A67064B8-335F-42C3-808A-A470BB4BFE5C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A67064B8-335F-42C3-808A-A470BB4BFE5C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A67064B8-335F-42C3-808A-A470BB4BFE5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A67064B8-335F-42C3-808A-A470BB4BFE5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A67064B8-335F-42C3-808A-A470BB4BFE5C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A67064B8-335F-42C3-808A-A470BB4BFE5C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{A67064B8-335F-42C3-808A-A470BB4BFE5C}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -197,5 +209,6 @@ Global
 		{CB7976A2-5089-4AC8-83C3-24FAB6F50ED4} = {8C1A5B2F-1EE3-4A27-A650-044905607028}
 		{B556850E-2EE3-4D1E-9A56-1D7C7C1C95EC} = {D5220D0A-6367-41C4-8409-989C4A909113}
 		{0BD77F13-8DF6-4C16-9508-33AA4CF0677A} = {D5220D0A-6367-41C4-8409-989C4A909113}
+		{A67064B8-335F-42C3-808A-A470BB4BFE5C} = {D5220D0A-6367-41C4-8409-989C4A909113}
 	EndGlobalSection
 EndGlobal

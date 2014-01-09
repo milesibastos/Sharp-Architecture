@@ -112,6 +112,10 @@
       <Project>{E12E99BB-8732-441F-B3A6-861F0CE23D3D}</Project>
       <Name>SharpArch.Domain</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SharpArch.NHibernate.FluentNHibernate\SharpArch.NHibernate.FluentNHibernate.csproj">
+      <Project>{a67064b8-335f-42c3-808a-a470bb4bfe5c}</Project>
+      <Name>SharpArch.NHibernate.FluentNHibernate</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SharpArch.NHibernate\SharpArch.NHibernate.csproj">
       <Project>{0BD77F13-8DF6-4C16-9508-33AA4CF0677A}</Project>
       <Name>SharpArch.NHibernate</Name>
