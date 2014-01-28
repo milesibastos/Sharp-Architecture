@@ -14,7 +14,7 @@
     <language>en-US</language>
     <dependencies>      
       <dependency id="CommonServiceLocator" version="1.0" />      
-      <dependency id="Newtonsoft.Json" version="5.0.6" />
+      <dependency id="Newtonsoft.Json" version="5.0.8" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.ComponentModel.DataAnnotations" targetFramework="net40" />

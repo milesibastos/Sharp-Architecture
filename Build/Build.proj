@@ -58,6 +58,12 @@
       <NuspecFile>MilesiBastos.SharpArch.NHibernate.nuspec</NuspecFile>
     </NugetPackage>
 
+    <NugetPackage Include="$(SolutionsPath)\SharpArch.NHibernate.FluentNHibernate\bin\Release\SharpArch.NHibernate.FluentNHibernate.dll;
+						   $(SolutionsPath)\SharpArch.NHibernate.FluentNHibernate\bin\Release\SharpArch.NHibernate.FluentNHibernate.pdb;">
+      <PackageName>SharpArch.NHibernate.FluentNHibernate</PackageName>
+      <NuspecFile>MilesiBastos.SharpArch.NHibernate.FluentNHibernate.nuspec</NuspecFile>
+    </NugetPackage>
+
     <NugetPackage Include="$(SolutionsPath)\SharpArch.RavenDB\bin\Release\SharpArch.RavenDB.dll;
 						   $(SolutionsPath)\SharpArch.RavenDB\bin\Release\SharpArch.RavenDB.pdb;">
       <PackageName>SharpArch.RavenDB</PackageName>
