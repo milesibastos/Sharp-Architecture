@@ -139,7 +139,7 @@
                 factoryKey,
                 mappingAssemblies,
                 autoPersistenceModel,
-                NHibernateSession.ConfigureNHibernate(cfgFile, cfgProperties),
+                ConfigureNHibernate(cfgFile, cfgProperties),
                 validatorCfgFile,
                 persistenceConfigurer);
 
@@ -163,6 +163,28 @@
                 mappingAssemblies, autoPersistenceModel, cfg, persistenceConfigurer);
 
             return NHibernateSession.AddConfiguration(factoryKey, sessionFactory, cfg, validatorCfgFile);
+        }
+
+        private static Configuration ConfigureNHibernate(string cfgFile, IDictionary<string, string> cfgProperties)
+        {
+            var cfg = new Configuration();
+
+            if (cfgProperties != null)
+            {
+                cfg.AddProperties(cfgProperties);
+            }
+
+            if (string.IsNullOrEmpty(cfgFile) == false)
+            {
+                return cfg.Configure(cfgFile);
+            }
+
+            if (File.Exists("Hibernate.cfg.xml"))
+            {
+                return cfg.Configure();
+            }
+
+            return cfg;
         }
 
         private static ISessionFactory CreateSessionFactoryFor(

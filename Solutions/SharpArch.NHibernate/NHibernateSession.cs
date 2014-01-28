@@ -10,6 +10,7 @@
 
     using global::NHibernate;
     using global::NHibernate.Cfg;
+    using global::NHibernate.Cfg.MappingSchema;
     using global::NHibernate.Event;
     using global::NHibernate.Engine;
     // using global::NHibernate.Validator.Engine;
@@ -182,9 +183,9 @@
             return factory;
         }
 
-        public static Configuration Init(ISessionStorage storage)
+        public static Configuration Init(ISessionStorage storage, params HbmMapping[] mapping)
         {
-            return Init(storage, null, null, null);
+            return Init(storage, null, null, null, mapping);
         }
 
         public static Configuration Init(ISessionStorage storage, string cfgFile)
@@ -208,12 +209,15 @@
             ISessionStorage storage,
             string cfgFile,
             IDictionary<string, string> cfgProperties,
-            string validatorCfgFile)
+            string validatorCfgFile, params HbmMapping[] mapping)
         {
             InitStorage(storage);
             Configuration config = ConfigureNHibernate(cfgFile, cfgProperties);
             try
             {
+                foreach (var map in mapping)
+                    config.AddDeserializedMapping(map, null);
+
                 return AddConfiguration(DefaultFactoryKey, config.BuildSessionFactory(), config, validatorCfgFile);
             }
             catch
@@ -285,7 +289,7 @@
             ConfigurationCache = null;
         }
 
-        internal static Configuration ConfigureNHibernate(string cfgFile, IDictionary<string, string> cfgProperties)
+        private static Configuration ConfigureNHibernate(string cfgFile, IDictionary<string, string> cfgProperties)
         {
             var cfg = new Configuration();
 
@@ -299,12 +303,7 @@
                 return cfg.Configure(cfgFile);
             }
 
-            if (File.Exists("Hibernate.cfg.xml"))
-            {
-                return cfg.Configure();
-            }
-
-            return cfg;
+            return cfg.Configure();
         }
 
     }
