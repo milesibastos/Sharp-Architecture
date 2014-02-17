@@ -108,6 +108,7 @@
     </Compile>
     <Compile Include="Contracts\Repositories\INHibernateRepository.cs" />
     <Compile Include="Contracts\Repositories\INHibernateRepositoryWithTypeId.cs" />
+    <Compile Include="EnumConvention.cs" />
     <Compile Include="TransactionManager.cs" />
     <Compile Include="DefaultSessionFactoryKeyProvider.cs" />
     <Compile Include="EntityDuplicateChecker.cs" />
