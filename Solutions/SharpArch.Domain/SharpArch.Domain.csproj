@@ -110,6 +110,7 @@
     <Compile Include="DomainModel\ValueObject.cs" />
     <Compile Include="Events\IHandles.cs" />
     <Compile Include="FileCache.cs" />
+    <Compile Include="PersistenceSupport\BaseRepository.cs" />
     <Compile Include="PersistenceSupport\ITransactionManager.cs" />
     <Compile Include="PersistenceSupport\ILinqRepository.cs" />
     <Compile Include="PersistenceSupport\ILinqRepositoryWithTypedId.cs" />
