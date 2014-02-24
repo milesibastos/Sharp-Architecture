@@ -7,6 +7,8 @@ namespace SharpArch.Domain.PersistenceSupport
 {
     public abstract class BaseRepository<T> : EnumerableQuery<T>, IRepository<T>
     {
+        private ICollection<T> _collection;
+
         // Summary:
         //     Initializes a new instance of the System.Linq.EnumerableQuery<T> class and
         //     associates the instance with an expression tree.
@@ -23,21 +25,25 @@ namespace SharpArch.Domain.PersistenceSupport
         // Parameters:
         //   enumerable:
         //     A collection to associate with the new instance.
-        public BaseRepository(IEnumerable<T> enumerable) : base(enumerable) { }
+        public BaseRepository(IEnumerable<T> enumerable)
+            : base(enumerable)
+        {
+            _collection = new List<T>(enumerable);
+        }
 
         public virtual T this[object id]
         {
-            get { return (T)this.Cast<IEntityWithTypedId<object>>().Single(x => x.Id == id); }
+            get { return (T)_collection.Cast<IEntityWithTypedId<object>>().Single(x => x.Id == id); }
         }
 
         public virtual bool Contains(T item)
         {
-            return this.Contains(item);
+            return _collection.Contains(item);
         }
 
         public virtual int Count
         {
-            get { return this.Count(); }
+            get { return _collection.Count(); }
         }
 
         public virtual bool IsReadOnly
@@ -52,7 +58,7 @@ namespace SharpArch.Domain.PersistenceSupport
 
         public virtual void CopyTo(T[] array, int arrayIndex)
         {
-            this.CopyTo(array, arrayIndex);
+            _collection.CopyTo(array, arrayIndex);
         }
 
         public abstract void Add(T item);
