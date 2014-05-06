@@ -211,21 +211,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Packages\System.Data.SQLite.1.0.90.0\content\net451\x86\SQLite.Interop.dll">
-      <Link>SQLite.Interop.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\Packages\System.Data.SQLite.1.0.90.0\content\net45\x64\SQLite.Interop.dll">
-      <Link>x64\SQLite.Interop.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\Packages\System.Data.SQLite.1.0.90.0\content\net45\x86\SQLite.Interop.dll">
-      <Link>x86\SQLite.Interop.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <Content Include="sqlite-nhibernate-config.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
+    </Content>
+    <Content Include="x64\SQLite.Interop.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="x86\SQLite.Interop.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />
   </ItemGroup>
